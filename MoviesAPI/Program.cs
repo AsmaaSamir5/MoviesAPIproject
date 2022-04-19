@@ -1,8 +1,14 @@
 using Microsoft.OpenApi.Models;
+using Microsoft.EntityFrameworkCore;
+using MoviesAPI.Models;
+using MoviesAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+var connectionString = builder.Configuration.GetConnectionString("DefautConnection");
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(connectionString));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -55,6 +61,10 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
+builder.Services.AddTransient<ICategoriesService, CategoriesService>();
+builder.Services.AddTransient<IMoviesService, MoviesService>();
+
+builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
 
@@ -67,7 +77,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors(c => c.AllowAnyHeader().AllowAnyMethode().AllowAnyOrigin());
+app.UseCors(c => c.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
 app.UseAuthorization();
 
